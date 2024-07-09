@@ -23,6 +23,13 @@ import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 
+/*
+* 在controller使用的是EmployeeDTO(Data Transfer Object),这样可以与视图层数据一致
+* 到service就可以操作真正的Employee实体，交由mapper层与数据库操作
+*
+*  对象属性拷贝
+    BeanUtils.copyProperties(employeeDTO, employee); // 源->目标
+* */
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
@@ -71,7 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
 
         // 对象属性拷贝
-        BeanUtils.copyProperties(employeeDTO,employee); // 源->目标
+        BeanUtils.copyProperties(employeeDTO, employee); // 源->目标
 
         employee.setStatus(StatusConstant.ENABLE);
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
@@ -86,10 +93,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
-        return new PageResult(page.getTotal(),page.getResult());
+        return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                .id(id).status(status).build();
+        employeeMapper.update(employee);
     }
 
 }
