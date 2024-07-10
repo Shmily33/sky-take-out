@@ -27,7 +27,7 @@ import java.util.UUID;
 public class CommonController {
 
     @Autowired
-    private AliOssUtil aliOssUtil;
+    private AliOssUtil aliOssUtil; // aliOSss
 
     @PostMapping("/upload")
     @ApiOperation("文件上传")
