@@ -10,6 +10,5 @@ sky:
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
     bucket-name: sky-itcast
-#    access key secret:
-#    access key id:
+
 
