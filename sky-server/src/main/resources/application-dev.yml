@@ -11,5 +11,5 @@ sky:
     endpoint: oss-cn-beijing.aliyuncs.com
     bucket-name: sky-itcast
     access-key-secret: U6k1brOZ8gaOIXv3nXbulGTUzy6Pd7
-    access-key-id: LTAI5tPeFLzsPPT8gG3LPW64
+#    access-key-id: LTAI5tPeFLzsPPT8gG3LPW64
 
