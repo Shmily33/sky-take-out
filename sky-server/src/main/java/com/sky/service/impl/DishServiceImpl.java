@@ -98,4 +98,35 @@ public class DishServiceImpl implements DishService {
 
     }
 
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        // 菜品表
+        Dish dish = dishMapper.getById(id);
+        // 关联的口味
+        List<DishFlavor> dishFlavor = dishFlavorMapper.getByDishId(id);
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish, dishVO);
+        dishVO.setFlavors(dishFlavor);
+        return dishVO;
+    }
+
+    @Transactional
+    @Override
+    public void updateWithFlavor(DishDTO dishDTO) {
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        dishMapper.update(dish);
+        // 口味有可能增删该了。那么我们处理方式先删掉原来的，在插入新的 等于覆盖
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+        List<DishFlavor> dishFlavors = dishDTO.getFlavors();
+        // 口味表插入n条数据
+        List<DishFlavor> flavors = dishDTO.getFlavors();
+        if (flavors != null && flavors.size() > 0) { // 不空且有数据存在
+            flavors.forEach(f -> {
+                f.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insertBatch(flavors); // 传入对象批量插入
+        }
+    }
+
 }
