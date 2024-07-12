@@ -9,10 +9,12 @@ import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
+import com.sky.entity.SetmealDish;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -36,6 +38,9 @@ public class DishServiceImpl implements DishService {
 
     @Autowired
     private DishMapper dishMapper;
+
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     @Autowired
     private DishFlavorMapper dishFlavorMapper;
@@ -118,6 +123,14 @@ public class DishServiceImpl implements DishService {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
         dishMapper.update(dish);
+        // 套餐菜品表也要更新
+        Long id = setmealDishMapper.getByDishId(dish.getId());
+        SetmealDish setmealDish = SetmealDish.builder()
+                .id(id)
+                .name(dish.getName())
+                .price(dish.getPrice()).build();
+        setmealDishMapper.update(setmealDish);
+
         // 口味有可能增删该了。那么我们处理方式先删掉原来的，在插入新的 等于覆盖
         dishFlavorMapper.deleteByDishId(dishDTO.getId());
         List<DishFlavor> dishFlavors = dishDTO.getFlavors();
@@ -143,10 +156,16 @@ public class DishServiceImpl implements DishService {
             if (setmealIds != null && setmealIds.size() > 0) {
                 for (Long setmealId : setmealIds) {
                     Setmeal setmeal = Setmeal.builder().id(setmealId).status(StatusConstant.DISABLE).build();
-                    setmealDishMapper.update(setmeal);
+                    setmealMapper.update(setmeal);
                 }
             }
         }
+    }
+
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder().categoryId(categoryId).status(StatusConstant.ENABLE).build();
+        return dishMapper.list(dish);
     }
 
 }
