@@ -13,3 +13,7 @@ sky:
     access-key-secret: U6k1brOZ8gaOIXv3nXbulGTUzy6Pd7
     access-key-id: LTAI5tPeFLzsPPT8gG3LPW64
 
+  redis:
+    host: localhost
+    port: 6379
+    database: 0 # 使用哪个数据库
