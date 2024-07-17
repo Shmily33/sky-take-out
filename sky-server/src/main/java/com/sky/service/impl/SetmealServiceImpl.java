@@ -106,10 +106,10 @@ public class SetmealServiceImpl implements SetmealService {
 
     @Override
     public void startOrStop(Integer status, Long id) {
-        if (status == StatusConstant.ENABLE) {
+        if (status == StatusConstant.ENABLE) { // 起售
             List<Integer> dishStatusList = setmealDishMapper.getStatusListBySetmealId(id);
             for (Integer dishStatus : dishStatusList) {
-                if (dishStatus == StatusConstant.DISABLE) {
+                if (dishStatus == StatusConstant.DISABLE) { // 有停售菜品，不允许起售
                     throw new DeletionNotAllowedException(MessageConstant.SETMEAL_ENABLE_FAILED);
                 }
             }

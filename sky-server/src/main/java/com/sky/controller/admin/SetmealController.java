@@ -68,7 +68,7 @@ public class SetmealController {
         return Result.success();
     }
 
-    @GetMapping("/status/{status}")
+    @PostMapping("/status/{status}")
     @ApiOperation("根据id起售或停售套餐")
     public Result startOrStop(@PathVariable Integer status, Long id) {
         log.info("根据id起售或停售套餐:{},{}", status, id);
