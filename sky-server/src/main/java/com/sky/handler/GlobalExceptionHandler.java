@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 捕获业务异常
-     *
+     * 全局异常
      * @param ex
      * @return
      */
