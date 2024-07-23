@@ -12,38 +12,36 @@
                 #{rejectionReason}, #{cancelTime}, #{estimatedDeliveryTime},
                 #{deliveryStatus}, #{deliveryTime},#{packAmount},#{tablewareNumber},#{tablewareStatus})
     </insert>
-<!--    <update id="update" parameterType="Employee">-->
-<!--        update employee-->
-<!--        <set>-->
-<!--            <if test="name != null">-->
-<!--                name = #{name},-->
-<!--            </if>-->
-<!--            <if test="username != null">-->
-<!--                username = #{username},-->
-<!--            </if>-->
-<!--            <if test="password != null">-->
-<!--                password = #{password},-->
-<!--            </if>-->
-<!--            <if test="phone != null">-->
-<!--                phone = #{phone},-->
-<!--            </if>-->
-<!--            <if test="sex != null">-->
-<!--                sex = #{sex},-->
-<!--            </if>-->
-<!--            <if test="idNumber != null">-->
-<!--                id_Number = #{idNumber},-->
-<!--            </if>-->
-<!--            <if test="updateTime != null">-->
-<!--                update_Time = #{updateTime},-->
-<!--            </if>-->
-<!--            <if test="updateUser != null">-->
-<!--                update_User = #{updateUser},-->
-<!--            </if>-->
-<!--            <if test="status != null">-->
-<!--                status = #{status},-->
-<!--            </if>-->
-<!--        </set>-->
-<!--        where id = #{id}-->
-<!--    </update>-->
+    <update id="update" parameterType="com.sky.entity.Orders">
+        update orders
+        <set>
+            <if test="cancelReason != null and cancelReason!='' ">
+                cancel_reason=#{cancelReason},
+            </if>
+            <if test="rejectionReason != null and rejectionReason!='' ">
+                rejection_reason=#{rejectionReason},
+            </if>
+            <if test="cancelTime != null">
+                cancel_time=#{cancelTime},
+            </if>
+            <if test="payStatus != null">
+                pay_status=#{payStatus},
+            </if>
+            <if test="payMethod != null">
+                pay_method=#{payMethod},
+            </if>
+            <if test="checkoutTime != null">
+                checkout_time=#{checkoutTime},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time = #{deliveryTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
 
 </mapper>
