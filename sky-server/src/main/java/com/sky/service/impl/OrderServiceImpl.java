@@ -249,4 +249,12 @@ public class OrderServiceImpl implements OrderService {
         shoppingCartMapper.insertBatch(shoppingCartList);
     }
 
+    @Override
+    public void updateStatus(OrdersPaymentDTO ordersPaymentDTO) {
+        Orders orders = orderMapper.getByNumber(ordersPaymentDTO.getOrderNumber());
+        orders.setStatus(Orders.TO_BE_CONFIRMED);
+        orders.setPayStatus(Orders.PAID);
+        orderMapper.update(orders);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.sky.controller.user;
 
+import com.sky.context.BaseContext;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.result.PageResult;
@@ -13,6 +14,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @Author: gs_wang
@@ -45,6 +49,18 @@ public class OrderController {
      */
     @PutMapping("/payment")
     @ApiOperation("订单支付")
+    public Result<String> payment2(@RequestBody OrdersPaymentDTO ordersPaymentDTO)  {
+        log.info("订单支付：{}", ordersPaymentDTO);
+//        OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
+        LocalDateTime time = LocalDateTime.now().plusHours(1);
+        // 定义日期时间格式化器
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String estimatedDeliveryTime = time.format(formatter);
+        orderService.updateStatus(ordersPaymentDTO);
+        return Result.success(estimatedDeliveryTime);
+    }
+//    @PutMapping("/payment")
+//    @ApiOperation("订单支付")
     public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
         log.info("订单支付：{}", ordersPaymentDTO);
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);

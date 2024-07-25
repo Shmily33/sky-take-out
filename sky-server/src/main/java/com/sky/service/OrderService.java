@@ -35,4 +35,6 @@ public interface OrderService {
     void userCancelById(Long id) throws Exception;
 
     void repetition(Long id);
+
+    void updateStatus(OrdersPaymentDTO ordersPaymentDTO);
 }
