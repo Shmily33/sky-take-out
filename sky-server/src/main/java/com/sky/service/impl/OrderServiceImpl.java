@@ -17,6 +17,7 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -214,11 +217,11 @@ public class OrderServiceImpl implements OrderService {
         // 订单处于待接单状态下取消，需要进行退款
         if (ordersDB.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
             //调用微信支付退款接口
-            weChatPayUtil.refund(
-                    ordersDB.getNumber(), //商户订单号
-                    ordersDB.getNumber(), //商户退款单号
-                    new BigDecimal(0.01),//退款金额，单位 元
-                    new BigDecimal(0.01));//原订单金额
+//            weChatPayUtil.refund(
+//                    ordersDB.getNumber(), //商户订单号
+//                    ordersDB.getNumber(), //商户退款单号
+//                    new BigDecimal(0.01),//退款金额，单位 元
+//                    new BigDecimal(0.01));//原订单金额
 
             //支付状态修改为 退款
             orders.setPayStatus(Orders.REFUND);
@@ -237,10 +240,10 @@ public class OrderServiceImpl implements OrderService {
         // 根据订单id查订单详情
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
         // 订单详情转购物车对象
-        List<ShoppingCart>shoppingCartList = orderDetailList.stream().map(x->{
+        List<ShoppingCart> shoppingCartList = orderDetailList.stream().map(x -> {
             ShoppingCart shoppingCart = new ShoppingCart();
             // 将原订单详情里面的菜品信息重新复制到购物车对象中
-            BeanUtils.copyProperties(x, shoppingCart,"id"); // 排除id元素
+            BeanUtils.copyProperties(x, shoppingCart, "id"); // 排除id元素
             shoppingCart.setUserId(userId);
             shoppingCart.setCreateTime(LocalDateTime.now());
             return shoppingCart;
@@ -255,6 +258,48 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.TO_BE_CONFIRMED);
         orders.setPayStatus(Orders.PAID);
         orderMapper.update(orders);
+    }
+
+    @Override
+    public PageResult pageQuery4Admin(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO); // 订单
+        // 订单详情
+        List<OrderVO> orderVOList = new ArrayList<>(); // 订单VO
+        if (page != null && page.getTotal() > 0) {
+            for (Orders orders : page) {
+                List<OrderDetail> orderDetail = orderDetailMapper.getByOrderId(orders.getId());
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders, orderVO);
+                orderVO.setOrderDetailList(orderDetail);
+                // 订单菜品信息
+                String orderDishes = getOrderDishes(orderDetail);
+                orderVO.setOrderDishes(orderDishes);
+                orderVOList.add(orderVO);
+            }
+        }
+        return new PageResult(page.getTotal(), orderVOList);
+    }
+
+    // 获取订单菜品信息
+    private String getOrderDishes(List<OrderDetail> orderDetail) {
+        List<String> orderDishList = orderDetail.stream().map(x -> {
+            String orderDishes = x.getName() + "*" + x.getNumber() + ";";
+            return orderDishes;
+        }).collect(Collectors.toList());
+        return String.join("", orderDishList); // String.join() 方法是用来连接字符串数组或集合中的元素，并且可以指定一个分隔符
+    }
+
+    @Override
+    public OrderStatisticsVO statistics() {
+        Integer toBeConfirmed = orderMapper.countStatus(Orders.TO_BE_CONFIRMED);
+        Integer confirmed = orderMapper.countStatus(Orders.CONFIRMED);
+        Integer deliveryInProgress = orderMapper.countStatus(Orders.DELIVERY_IN_PROGRESS);
+        return OrderStatisticsVO.builder()
+                .toBeConfirmed(toBeConfirmed)
+                .confirmed(confirmed)
+                .deliveryInProgress(deliveryInProgress).build();
     }
 
 }
