@@ -49,7 +49,7 @@ public class OrderController {
      */
     @PutMapping("/payment")
     @ApiOperation("订单支付")
-    public Result<String> payment2(@RequestBody OrdersPaymentDTO ordersPaymentDTO)  {
+    public Result<String> payment2(@RequestBody OrdersPaymentDTO ordersPaymentDTO) {
         log.info("订单支付：{}", ordersPaymentDTO);
 //        OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
         LocalDateTime time = LocalDateTime.now().plusHours(1);
@@ -59,7 +59,8 @@ public class OrderController {
         orderService.updateStatus(ordersPaymentDTO);
         return Result.success(estimatedDeliveryTime);
     }
-//    @PutMapping("/payment")
+
+    //    @PutMapping("/payment")
 //    @ApiOperation("订单支付")
     public Result<OrderPaymentVO> payment(@RequestBody OrdersPaymentDTO ordersPaymentDTO) throws Exception {
         log.info("订单支付：{}", ordersPaymentDTO);
@@ -97,6 +98,14 @@ public class OrderController {
     public Result repetition(@PathVariable Long id) {
         log.info("再来一单:{}", id);
         orderService.repetition(id);
+        return Result.success();
+    }
+
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("催单")
+    public Result reminder(@PathVariable Long id) {
+        log.info("催单：{}", id);
+        orderService.reminder(id);
         return Result.success();
     }
 
