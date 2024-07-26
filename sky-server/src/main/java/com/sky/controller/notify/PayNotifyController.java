@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 /**
- * 支付回调相关接口
+ * 支付回调相关接口,微信服务器回调
  */
 @RestController
 @RequestMapping("/notify")

@@ -21,6 +21,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Value("${sky.baidu.ak}")
     private String ak;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 检查客户的收货地址是否超出配送范围
@@ -326,12 +330,22 @@ public class OrderServiceImpl implements OrderService {
         shoppingCartMapper.insertBatch(shoppingCartList);
     }
 
+    // 跳过微信支付直接更新，以便于测试
     @Override
     public void updateStatus(OrdersPaymentDTO ordersPaymentDTO) {
         Orders orders = orderMapper.getByNumber(ordersPaymentDTO.getOrderNumber());
         orders.setStatus(Orders.TO_BE_CONFIRMED);
         orders.setPayStatus(Orders.PAID);
+        orders.setCheckoutTime(LocalDateTime.now());
         orderMapper.update(orders);
+        // 通过WebSocket向客户端推送消息
+        Map map = new HashMap<>();
+        map.put("type", 1); // 表示来单提醒
+        map.put("orderId", orders.getId()); // 表示来单提醒
+        map.put("content","订单号："+ordersPaymentDTO.getOrderNumber());
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
+
     }
 
     @Override
