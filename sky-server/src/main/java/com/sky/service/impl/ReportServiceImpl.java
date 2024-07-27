@@ -57,8 +57,8 @@ public class ReportServiceImpl implements ReportService {
             LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
             LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
             Map map = new HashMap<>();
-            map.put("beginTime", beginTime);
-            map.put("endTime", endTime);
+            map.put("begin", beginTime);
+            map.put("end", endTime);
             map.put("status", Orders.COMPLETED);
             Double turnover = orderMapper.sumByMap(map); // 查不到返回的其实是null
             turnover = turnover == null ? 0.0 : turnover;
@@ -91,10 +91,10 @@ public class ReportServiceImpl implements ReportService {
             LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
             LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
             Map map = new HashMap<>();
-            map.put("endTime", endTime);
+            map.put("end", endTime);
             Integer totalUser = userMapper.countByMap(map); // 总数,因为没有beginTime,sql查的总数
             totalUser = totalUser == null ? 0 : totalUser;
-            map.put("beginTime", beginTime);
+            map.put("begin", beginTime);
             Integer newUser = userMapper.countByMap(map); // 新增
             newUser = newUser == null ? 0 : newUser;
 
@@ -183,8 +183,8 @@ public class ReportServiceImpl implements ReportService {
 
     private Integer getOrderCount(LocalDateTime beginTime, LocalDateTime endTime, Integer status) {
         Map map = new HashMap<>();
-        map.put("beginTime", beginTime);
-        map.put("endTime", endTime);
+        map.put("begin", beginTime);
+        map.put("end", endTime);
         map.put("status", status);
         return orderMapper.countByMap(map);
     }
