@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * WebSocket服务
+ * WebSocket服务--还有WebSocketConfig
  */
 @Component
 @ServerEndpoint("/ws/{sid}")
